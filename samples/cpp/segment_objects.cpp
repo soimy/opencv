@@ -53,7 +53,7 @@ static void refineSegments(const Mat& img, Mat& mask, Mat& dst)
         }
     }
     Scalar color( 0, 0, 255 );
-    drawContours( dst, contours, largestComp, color, FILLED, LINE_8, hierarchy );
+    drawContours( dst, contours, largestComp, color, CV_FILLED, 8, hierarchy );
 }
 
 
@@ -87,15 +87,14 @@ int main(int argc, char** argv)
     namedWindow("video", 1);
     namedWindow("segmented", 1);
 
-    Ptr<BackgroundSubtractorMOG> bgsubtractor=createBackgroundSubtractorMOG();
-    bgsubtractor->setNoiseSigma(10);
+    BackgroundSubtractorMOG2 bgsubtractor(50, 4.0f) ;
 
     for(;;)
     {
         cap >> tmp_frame;
         if( !tmp_frame.data )
             break;
-        bgsubtractor->apply(tmp_frame, bgmask, update_bg_model ? -1 : 0);
+        bgsubtractor(tmp_frame, bgmask, update_bg_model ? -1 : 0);
         refineSegments(tmp_frame, bgmask, out_frame);
         imshow("video", tmp_frame);
         imshow("segmented", out_frame);
